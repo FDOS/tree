@@ -1,4 +1,4 @@
-pdTree v1.03
+pdTree v1.04
 It is released US public domain.  [note: may use LGPL Cats]
 Run tree with /? for help in using tree.
 
@@ -15,6 +15,7 @@ Note: The following nonstandard options are not documented
 /DF - display filesizes
 /DA - display attributes (Hidden,System,Readonly,Archive)
 /DH - display hidden and system files (normally not shown)
+/DS - display alternate data streams when exist (Win32 only)
 /U  - use Unicode (UTF-8) characters [Experimental, see usage notes in tree.htm]
 
 TODO:
@@ -95,13 +96,13 @@ It may be somewhat slower than other implementations, because it must
   (Note w98 explorer will die if you try to 'select all' on that many 
   files. :)
 
-pdTree v1.03
+pdTree v1.04
 Original location: http://www.darklogic.org/fdos/tree/
 
   Written by: Kenneth J. Davis
   Date:       August, 2000
   Updated:    September, 2000; October, 2000; November, 2000; January, 2001;
-              May, 2004
+              May, 2004; Sept, 2005
   Contact:    jeremyd@computer.org
 
 

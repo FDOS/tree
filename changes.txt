@@ -9,6 +9,11 @@ Future Plans:  When time permits.  KJD
                Update cats library (use cats v4 aka kitten
                for DOS and cats v3.97 for Windows)
 
+Sept 12, 2005  pdTree V1.04 Release   KJD
+               Add /DS option to display alternate streams in files
+               on Windows NT systems with NTFS.  Use with /F option.
+               See notes for V1.03 Beta about DOS version.
+
 Dec 03, 2004   --   KJD
                Official source now in fdos project cvs on SourceForge.
                Moved fixstub to TOOLS module (fixhdr).

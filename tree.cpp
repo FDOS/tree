@@ -7,14 +7,14 @@
 
 ****************************************************************************/
 
-#define VERSION "1.03"
+#define VERSION "1.04"
 
 /****************************************************************************
 
   Written by: Kenneth J. Davis
   Date:       August, 2000
   Updated:    September, 2000; October, 2000; November, 2000; January, 2001;
-              May, 2004
+              May, 2004; Sept, 2005
   Contact:    jeremyd@computer.org
 
 
@@ -96,6 +96,10 @@ int LFN_Enable_Flag = LFN_ENABLE;
 #define UDOT L"."
 #define UDOTDOT L".."
 
+
+/* Stream display is only supported for Win32, specifically Windows NT */
+#include "streams.c"
+
 #else                   /* DOS specific         */
 /* Win32 File compability stuff */
 #include "w32fDOS.h"
@@ -167,6 +171,7 @@ short dspAll = 0;  /* if nonzero includes HIDDEN & SYSTEM files in output */
 short dspSize = 0; /* if nonzero displays filesizes                       */
 short dspAttr = 0; /* if nonzero displays file attributes [DACESHRBP]     */
 short dspSumDirs = 0; /* show count of subdirectories  (per dir and total)*/
+short dspStreams = 0; /* if nonzero tries to display nondefault streams   */
 
 
 /* maintains total count, for > 4billion dirs, use a __int64 */
@@ -687,6 +692,9 @@ void parseArguments(int argc, char *argv[])
           case 'R' :       /*  /DR  display results at end */
             dspSumDirs = 1;
             break;
+          case 'S' :       /*  /DS  display alternate file streams */
+            dspStreams = 1;
+            break;
           default:
             showInvalidUsage(argv[i]);
         }
@@ -942,8 +950,8 @@ SUBDIRINFO *newSubdirInfo(SUBDIRINFO *parent, char *subdir, char *dsubdir)
        ((temp->dsubdir = (char *)malloc(strlen(dsubdir)+1)) == NULL) )
   {
     showOutOfMemory(subdir);
-    free(temp);
     if (temp->currentpath != NULL) free(temp->currentpath);
+    free(temp);
     return NULL;
   }
   temp->parent = parent;
@@ -1149,7 +1157,7 @@ void displaySummary(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddat
  */
 int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata)
 {
-  char buffer[MAXBUF];
+  static char buffer[MAXBUF];
   WIN32_FIND_DATA entry; /* current directory entry info    */
   HANDLE dir;         /* Current directory entry working with      */
   unsigned long filesShown = 0;
@@ -1226,6 +1234,48 @@ int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata)
 
       /* print filename */
       pprintf("%s\n", entry.cFileName);
+
+#ifdef WIN32  /* streams are only available on NTFS systems with NT API */
+      if (dspStreams)
+      {
+        FILE_STREAM_INFORMATION *fsi;
+
+        /* build full path to this filename */
+        strcpy(buffer, path);
+        strcat(buffer, entry.cFileName);
+
+        /* try to get all streams associated with this file */
+        fsi = getFileStreamInfo(buffer);
+
+        while (fsi != NULL)
+        {
+          /* check and ignore default $DATA stream */
+#if 1
+          if ((fsi->StreamNameLength != DefaultStreamNameLengthBytes) ||
+              (memcmp(fsi->StreamName, DefaultStreamName, DefaultStreamNameLengthBytes)!=0))
+#endif
+          {
+            /* print lead padding and spacing so fall under name */
+            pprintf("%s", padding);
+            if (dspAttr) pprintf("           ");
+            if (dspSize) pprintf("           ");
+            pprintf("  ");  /* extra spacing so slightly indented from filename */
+
+            /* convert to UTF8 (really should convert to OEM or UTF8 as indicated) */
+            convertUTF16toUTF8(fsi->StreamName, buffer, MAXBUF);
+
+            /* and display it */
+            pprintf("%s\n", buffer);
+          }
+
+          /* either proceed to next entry or mark end */
+          if (fsi->NextEntryOffset)
+            fsi = (FILE_STREAM_INFORMATION *)(((byte *)fsi) + fsi->NextEntryOffset);
+          else
+            fsi = NULL;  /* end of available data */
+        }
+      }
+#endif /* WIN32 */
 
       filesShown++;
     }
@@ -1729,6 +1779,9 @@ void initFuncPtrs(void)
     pFindFirstFileExW = (fFindFirstFileExW)GetProcAddress(hKERNEL32, "FindFirstFileExW");
     if (pFindFirstFileExW == NULL)  printf("WARNING: unable to get FindFirstFileExW, %i\n", GetLastError());
   }
+
+  /* also for stream support; it uses NTDLL.DLL, which we also assume always loaded if available */
+  initStreamSupport();
 #endif
 }
 

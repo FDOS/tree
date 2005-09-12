@@ -19,6 +19,8 @@ tree.htm     Help file (based on and) for Joe Cosentino's <jayc17@mediaone.net> 
 stack.h      Public domain stack functions written by Andrew Clarke (1995,96), header file
 stack.c      implementation (slightly modified)
 
+stream.c     Public domain NT streams functions based on streams.cpp by Felix Kasza (1998?)
+
 tree.def     A definition file created and deleted when compiling with Borland's BCC55
              and specifying a STUB file.  Should be deleted if exists.
 
