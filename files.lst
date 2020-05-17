@@ -14,6 +14,7 @@ w32api.cpp   Win32 API compatibility functions (memory model neutral)
 
 tree.en      Message catalog containing same text that is hard coded.
 tree.es      Message catalog containing spanish text, special thanks to Aitor Santamaria Merino.
+tree.tr      Message catalog containing Turkish text, Emir SARI <bitigchi@me.com>
 tree.htm     Help file (based on and) for Joe Cosentino's <jayc17@mediaone.net> HTML Help.
 
 stack.h      Public domain stack functions written by Andrew Clarke (1995,96), header file
