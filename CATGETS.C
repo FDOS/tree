@@ -234,14 +234,15 @@ _catread (char *catfile)
       /* A line that starts with '#' is considered a comment, and will
          be thrown away without reading it. */
 
-      /* Assumes no blank lines */
+      /* Blank lines and lines without "key:value" are skipped */
 
       if (str[0] != '#')
 	{
 	  key = strtok (str, ":");
 	  value = strtok (NULL, "\n");
 
-	  db_insert (key, value);
+	  if (key != NULL && value != NULL)
+	    db_insert (key, value);
 	} /* if comment */
 
       free (str);
