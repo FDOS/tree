@@ -82,7 +82,7 @@ get_line (FILE *pfile, int continue_ch)
 	{
 	  /* is the string terminated? */
 
-	  if (last_ch == continue_ch)
+	  if (continue_ch && last_ch == continue_ch)
 	    {
 	      /* string is continued on next line ... ignore this ch
                  and erase last_ch in the string */
